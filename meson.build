@@ -43,6 +43,7 @@ if get_option('buildtype') == 'release'
   abseil_flags = cpp.get_supported_arguments('-Wno-error=maybe-uninitialized', '-Wno-maybe-uninitialized')
   add_global_arguments(abseil_flags, language: 'cpp')
 endif
+
 abseil_proj = subproject('abseil-cpp')
 taskflow_proj = dependency('taskflow', fallback: ['taskflow', 'taskflow_dep'])
 
@@ -130,8 +131,28 @@ else
   ucx_dep = dependency('ucx', modules: ['ucx::ucs', 'ucx::ucp', 'ucx::uct'])
 endif
 
+# Libfabrics/OFI detection
+libfabric_path = get_option('libfabric_path')
+if libfabric_path != ''
+  libfabric_lib_path = libfabric_path + '/lib'
+  libfabric_inc_path = libfabric_path + '/include'
+  libfabric_dep = declare_dependency(
+    link_args : ['-L' + libfabric_lib_path, '-lfabric'],
+    include_directories : include_directories(libfabric_inc_path))
+else
+  libfabric_dep = dependency('libfabric', required: false)
+endif
+
+if not libfabric_dep.found()
+  libfabric_dep = cpp.find_library('fabric', required: false)
+endif
+
 if get_option('disable_gds_backend')
     add_project_arguments('-DDISABLE_GDS_BACKEND', language: 'cpp')
+endif
+
+if get_option('disable_ofi_backend')
+    add_project_arguments('-DDISABLE_OFI_BACKEND', language: 'cpp')
 endif
 
 # Configure NDEBUG for release builds

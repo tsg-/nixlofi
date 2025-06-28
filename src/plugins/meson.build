@@ -14,6 +14,7 @@
 # limitations under the License.
 
 ucx_backend_inc_dirs = include_directories('./ucx')
+ofi_backend_inc_dirs = include_directories('./ofi')
 
 subdir('ucx')
 subdir('ucx_mo')
@@ -28,6 +29,11 @@ endif
 
 if taskflow_proj.found() and cuda_dep.found() and not disable_gds_backend
       subdir('gds_mt')
+endif
+
+disable_ofi_backend = get_option('disable_ofi_backend')
+if not disable_ofi_backend and libfabric_dep.found()
+    subdir('ofi')
 endif
 
 cc = meson.get_compiler('cpp')
@@ -46,3 +52,5 @@ endif
 if cuda_dep.found() and doca_gpunetio_dep.found()
     subdir('gpunetio')
 endif
+
+
