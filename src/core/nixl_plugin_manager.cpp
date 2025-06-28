@@ -429,4 +429,11 @@ void nixlPluginManager::registerBuiltinPlugins() {
         extern nixlBackendPlugin *createStaticMooncakePlugin();
         registerStaticPlugin("MOONCAKE", createStaticMooncakePlugin);
 #endif // STATIC_PLUGIN_MOONCAKE
+
+#ifdef STATIC_PLUGIN_OFI
+#ifndef DISABLE_OFI_BACKEND
+        extern nixlBackendPlugin* createStaticOFIPlugin();
+        registerStaticPlugin("OFI", createStaticOFIPlugin);
+#endif // DISABLE_OFI_BACKEND
+#endif // STATIC_PLUGIN_OFI
 }
