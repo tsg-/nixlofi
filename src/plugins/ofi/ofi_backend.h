@@ -27,19 +27,21 @@
 #include <rdma/fi_endpoint.h>
 #include <rdma/fi_cm.h>
 #include <rdma/fi_eq.h>
-#include <rdma/fi_cq.h>
+// #include <rdma/fi_cq.h>
 #include <rdma/fi_ext.h>
 
 #include <string>
 #include <map>
 #include <mutex>
+#include <thread>
+#include <atomic>
 
 class nixlOFI_Metadata : public nixlBackendMD {
 public:
     fid_mr *mr;
     void *desc;
 
-    nixlOFI_Metadata() : mr(nullptr), desc(nullptr) { }
+    nixlOFI_Metadata() : nixlBackendMD(false), mr(nullptr), desc(nullptr) { }
     ~nixlOFI_Metadata() { }
 };
 
@@ -59,6 +61,7 @@ private:
     fid_ep *ep;
     fid_cq *cq;
     fid_eq *eq;
+    fid_pep *pep;
     struct fi_info *fi;
 
     std::string provider_name;
@@ -66,7 +69,10 @@ private:
     std::string local_addr;
     std::map<std::string, std::string> remote_addrs;
     std::map<std::string, fid_ep *> connected_eps;
+    std::map<std::string, fi_addr_t> shm_addrs;
+    fid_av *av;
     mutable std::mutex ep_lock;
+    bool is_connectionless;
 
     std::thread eq_thread;
     std::atomic<bool> eq_thread_stop;
@@ -78,6 +84,14 @@ private:
     std::string local_agent_name;
 
     void eq_event_loop();
+    bool isConnectionlessProvider() const;
+    nixl_status_t setupEndpoint(bool connection_oriented);
+    static nixl_status_t getEndpointAddress(fid_ep* endpoint, std::string& address);
+    static void detectHmemCapabilities(struct fi_info* fi_info,
+                                       const std::string& provider_name,
+                                       bool& cuda_supported,
+                                       bool& ze_supported,
+                                       bool& synapseai_supported);
 
 public:
     nixlOFI_Engine(const nixlBackendInitParams* init_params);
@@ -97,7 +111,14 @@ public:
                              const nixl_mem_t &nixl_mem,
                              nixlBackendMD* &out) override;
     nixl_status_t deregisterMem(nixlBackendMD *meta) override;
+    nixl_status_t unloadMD(nixlBackendMD* input) override;
 
+    nixl_status_t prepXfer(const nixl_xfer_op_t &operation,
+                          const nixl_meta_dlist_t &local,
+                          const nixl_meta_dlist_t &remote,
+                          const std::string &remote_agent,
+                          nixlBackendReqH* &handle,
+                          const nixl_opt_b_args_t* opt_args=nullptr) const override;
     nixl_status_t postXfer(const nixl_xfer_op_t &operation,
                           const nixl_meta_dlist_t &local,
                           const nixl_meta_dlist_t &remote,

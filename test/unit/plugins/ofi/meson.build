@@ -13,10 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+gtest_dep = dependency('gtest', version : '>=1.11.0', required : true)
+
 ofi_backend_dep = declare_dependency(link_with: ofi_backend_lib, include_directories: [nixl_inc_dirs, '../../../../src/plugins/ofi'])
 
 ofi_backend_test = executable('ofi_backend_test',
         'ofi_backend_test.cpp',
-        dependencies: [nixl_dep, nixl_infra, nixl_common_deps, ofi_backend_dep, libfabric_dep, thread_dep],
+        dependencies: [nixl_dep, nixl_infra, nixl_common_deps, ofi_backend_dep, libfabric_dep, thread_dep, gtest_dep],
         include_directories: [nixl_inc_dirs, utils_inc_dirs, '../../../../src/plugins/ofi'],
         install: true)
+
+test('ofi_backend_test', ofi_backend_test)
+
