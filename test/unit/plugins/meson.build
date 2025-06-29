@@ -17,6 +17,11 @@ subdir('ucx')
 subdir('ucx_mo')
 subdir('posix')
 
+disable_ofi_backend = get_option('disable_ofi_backend')
+if libfabric_dep.found() and not disable_ofi_backend
+    subdir('ofi')
+endif
+
 
 if cuda_dep.found() and doca_gpunetio_dep.found()
     subdir('gpunetio')
