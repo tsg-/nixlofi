@@ -45,8 +45,15 @@ namespace
     }
     
     static nixl_b_params_t
-        Dget_backend_options() {
-        V nixl_b_params_t params;
+    get_backend_options() {
+        nixl_b_params_t params;
+        params["provider"] = "verbs";  // Default to verbs as per requirements
+        params["eq_timeout_ms"] = "100";
+        params["fabric"] = "";  // Optional fabric name
+        params["domain"] = "";  // Optional domain name
+        params["roce_version"] = "2";  // RoCEv2 optimization
+        params["inline_threshold"] = "64";  // Inline send optimization
+        params["tx_queue_size"] = "256";  // TX queue size for performance
         return params;
     }
     

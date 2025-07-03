@@ -27,10 +27,10 @@
 class OFIBackendTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        init_params.localAgentName = "test_agent";
+        init_params.localAgent = "test_agent";
         custom_params["provider"] = "verbs;ofi_rxm";
         custom_params["eq_timeout_ms"] = "100";
-        init_params.customParams = &custom_params;
+        init_params.customParams = reinterpret_cast<nixl_b_params_t*>(&custom_params);
     }
 
     void TearDown() override {
@@ -138,7 +138,7 @@ TEST_F(OFIBackendTest, RegisterMemoryDRAM) {
     ASSERT_NE(buffer, nullptr);
 
     nixlBlobDesc mem_desc;
-    mem_desc.addr = buffer;
+    mem_desc.addr = reinterpret_cast<uintptr_t>(buffer);
     mem_desc.len = buffer_size;
     mem_desc.devId = 0;
 
@@ -179,10 +179,10 @@ TEST_F(OFIBackendTest, ReleaseReqHWithNullHandle) {
 class OFISHMProviderTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        init_params.localAgentName = "shm_test_agent";
+        init_params.localAgent = "shm_test_agent";
         custom_params["provider"] = "shm";
         custom_params["eq_timeout_ms"] = "100";
-        init_params.customParams = &custom_params;
+        init_params.customParams = reinterpret_cast<nixl_b_params_t*>(&custom_params);
     }
 
     void TearDown() override {
