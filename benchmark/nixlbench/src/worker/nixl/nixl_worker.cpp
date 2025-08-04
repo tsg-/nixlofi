@@ -100,6 +100,7 @@ xferBenchNixlWorker::xferBenchNixlWorker(int *argc, char ***argv, std::vector<st
         0 == xferBenchConfig::backend.compare(XFERBENCH_BACKEND_UCX_MO) ||
         0 == xferBenchConfig::backend.compare(XFERBENCH_BACKEND_GPUNETIO) ||
         0 == xferBenchConfig::backend.compare(XFERBENCH_BACKEND_MOONCAKE) ||
+        0 == xferBenchConfig::backend.compare(XFERBENCH_BACKEND_OFI) ||
         xferBenchConfig::isStorageBackend()) {
         backend_name = xferBenchConfig::backend;
     } else {
@@ -184,6 +185,9 @@ xferBenchNixlWorker::xferBenchNixlWorker(int *argc, char ***argv, std::vector<st
         }
 
         std::cout << "OBJ backend" << std::endl;
+    } else if (0 == xferBenchConfig::backend.compare(XFERBENCH_BACKEND_OFI)) {
+        // Using default param values for OFI backend
+        std::cout << "OFI backend" << std::endl;
     } else {
         std::cerr << "Unsupported NIXLBench backend: " << xferBenchConfig::backend << std::endl;
         exit(EXIT_FAILURE);
