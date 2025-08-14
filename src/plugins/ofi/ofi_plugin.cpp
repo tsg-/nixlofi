@@ -26,7 +26,7 @@ namespace
     // create a new OFI backend engine instance
     static nixlBackendEngine *
     create_ofi_engine (const nixlBackendInitParams *init_params) {
-    return new nixlOFI_Engine (init_params);
+        return new nixlOFI_Engine (init_params);
     }
     
     static void
@@ -93,7 +93,7 @@ nixl_plugin_init() {
 // Plugin cleanup function
 extern "C" NIXL_PLUGIN_EXPORT void
 nixl_plugin_fini() {
-    // Cleanup any resources if needed
+    // Cleanup
 }
 
 #endif
